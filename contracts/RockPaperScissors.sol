@@ -68,7 +68,9 @@ contract RockPaperScissors {
     }
 
     /// @notice This function is used to created a salted hash of the move in order to preserve privacy of a players move
-    /// @param _move is the player move, _salt a password provided by the user
+    /// @param _move is the player move
+    /// @param _salt a password provided by the user
+    /// @return a salted hash of the players move
     function getSaltedHash(Move _move, string memory _salt)
         public
         pure
@@ -81,6 +83,7 @@ contract RockPaperScissors {
     /// @notice This function allows a user to create a game, they must provide a salted hash of their move (from getSaltedHash) and add the entry fee
     /// @param _hashedMove is the salted hash of the players move
     /// @dev We temporarily assign the player guest struct fields addr and _hashedMove with the same values as their respective player host struct fields
+    /// @return gameId is the index of the game within the games mapping
     function createGame(bytes32 _hashedMove)
         public
         payable
@@ -110,7 +113,8 @@ contract RockPaperScissors {
     }
 
     /// @notice This function allows a user to join a game
-    /// @param _gameId is the id of the game to join and _hashedMove is the salted hash of the players move
+    /// @param _gameId is the index of the game within the games mapping
+    /// @param _hashedMove is the salted hash of the players move
     function joinGame(uint _gameId, bytes32 _hashedMove) public payable {
         require(
             games[_gameId].gameStatus == GameStatus.STATUS_NOT_STARTED &&
@@ -128,8 +132,72 @@ contract RockPaperScissors {
         games[_gameId].gameStatus = GameStatus.STATUS_IN_PROGRESS;
     }
 
-    // Add reveal move function
-    // Add compare move function
+    /// @notice Ensures that the caller is a player in the game
+    /// @param _gameId is the index of the game within the games mapping
+    modifier isPlayer(uint _gameId, address sender) {
+        require(
+            sender == games[_gameId].host.addr ||
+                sender == games[_gameId].guest.addr
+        );
+        _;
+    }
+
+    /// @dev Helper function to compare player moves
+    /// @param _gameId is the index of the game within the games mapping
+    function compareMoves(uint _gameId) private {
+        uint8 host = uint8(games[_gameId].host.move);
+        uint8 guest = uint8(games[_gameId].guest.move);
+
+        if (guest == host) {
+            games[_gameId].host.playerStatus = PlayerStatus.STATUS_TIE;
+            games[_gameId].guest.playerStatus = PlayerStatus.STATUS_TIE;
+        } else if ((guest + 1) % 3 == host) {
+            games[_gameId].host.playerStatus = PlayerStatus.STATUS_WIN;
+            games[_gameId].guest.playerStatus = PlayerStatus.STATUS_LOSE;
+        } else if ((host + 1) % 3 == guest) {
+            games[_gameId].host.playerStatus = PlayerStatus.STATUS_LOSE;
+            games[_gameId].guest.playerStatus = PlayerStatus.STATUS_WIN;
+        } else {
+            games[_gameId].gameStatus = GameStatus.STATUS_ERROR;
+        }
+    }
+
+    /// @notice Ensures that the caller is a player in the game
+    /// @param _gameId is the index of the game within the games mapping
+    /// @param _move is the unhashed player move
+    /// @param _salt is the players password
+    function revealMove(
+        uint _gameId,
+        Move _move,
+        string memory _salt
+    ) public isPlayer(_gameId, msg.sender) {
+        require(
+            games[_gameId].host.addr != games[_gameId].guest.addr,
+            "You are the only person in the game, you cannot reveal until someone joins!"
+        );
+        if (msg.sender == games[_gameId].host.addr) {
+            require(
+                games[_gameId].host.hashedMove ==
+                    keccak256(abi.encodePacked(_move, _salt)),
+                "Incorrect entry - Please check your move and password again!"
+            );
+            games[_gameId].host.move = _move;
+        } else if (msg.sender == games[_gameId].guest.addr) {
+            require(
+                games[_gameId].guest.hashedMove ==
+                    keccak256(abi.encodePacked(_move, _salt)),
+                "Incorrect entry - Please check your move and password again!"
+            );
+            games[_gameId].guest.move = _move;
+        }
+        if (
+            games[_gameId].host.move != Move.notRevealed &&
+            games[_gameId].guest.move != Move.notRevealed
+        ) {
+            compareMoves(_gameId);
+        }
+    }
+
     // Add payout function
     // Add request refund function
 }
