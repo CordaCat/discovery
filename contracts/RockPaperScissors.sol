@@ -47,18 +47,17 @@ contract RockPaperScissors {
         GameStatus gameStatus;
     }
 
-    /// @notice Stores instances on a Game struct in a mapping, can be accessed using games[gameId]
+    /// @notice Stores instances of a Game struct in a mapping, can be accessed using games[gameId]
     mapping(uint => Game) public games;
 
     /// @notice Stores the next game Id, is incremented(in createGame function) everytime a game is created
-    uint nextGameId = 0;
+    uint public nextGameId = 0;
 
     /// @notice Stores the rollover amount in case there is a draw
     uint256 public rolloverPot = 0;
 
-    // Functions: createGame, joinGame, revealMoves, compareMoves, payout, requestRefund
-
-    /// @notice Check if move is valid
+    /// @notice Check if move is valid, we restrict the move to rock, paper or scissors
+    /// @param _move is the player move
     modifier isValidMove(Move _move) {
         require(
             (_move == Move.rock) ||
@@ -69,6 +68,7 @@ contract RockPaperScissors {
     }
 
     /// @notice This function is used to created a salted hash of the move in order to preserve privacy of a players move
+    /// @param _move is the player move, _salt a password provided by the user
     function getSaltedHash(Move _move, string memory _salt)
         public
         pure
@@ -79,7 +79,8 @@ contract RockPaperScissors {
     }
 
     /// @notice This function allows a user to create a game, they must provide a salted hash of their move (from getSaltedHash) and add the entry fee
-    /// @dev We temporarily assign the player guest struct fields addr and _hashedMove with the same values as the respective player host struct fields
+    /// @param _hashedMove is the salted hash of the players move
+    /// @dev We temporarily assign the player guest struct fields addr and _hashedMove with the same values as their respective player host struct fields
     function createGame(bytes32 _hashedMove)
         public
         payable
@@ -108,7 +109,27 @@ contract RockPaperScissors {
         nextGameId = nextGameId + 1;
     }
 
-    // Events
+    /// @notice This function allows a user to join a game
+    /// @param _gameId is the id of the game to join and _hashedMove is the salted hash of the players move
+    function joinGame(uint _gameId, bytes32 _hashedMove) public payable {
+        require(
+            games[_gameId].gameStatus == GameStatus.STATUS_NOT_STARTED &&
+                msg.value == entryFee,
+            "Please check game id and ensure you have sent the exact entry fee"
+        );
+        games[_gameId].guest = Player({
+            addr: payable(msg.sender),
+            playerBetAmount: msg.value,
+            hashedMove: _hashedMove,
+            move: Move.notRevealed,
+            playerStatus: PlayerStatus.STATUS_PENDING
+        });
+        games[_gameId].potAmount = games[_gameId].potAmount + msg.value;
+        games[_gameId].gameStatus = GameStatus.STATUS_IN_PROGRESS;
+    }
 
-    // Errors
+    // Add reveal move function
+    // Add compare move function
+    // Add payout function
+    // Add request refund function
 }
