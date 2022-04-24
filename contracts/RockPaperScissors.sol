@@ -36,7 +36,7 @@ contract RockPaperScissors {
     enum GameStatus {
         STATUS_NOT_STARTED,
         STATUS_IN_PROGRESS,
-        STAUS_COMPLETE,
+        STATUS_COMPLETE,
         STATUS_ERROR
     }
 
@@ -50,7 +50,7 @@ contract RockPaperScissors {
     /// @notice Stores instances of a Game struct in a mapping, can be accessed using games[gameId]
     mapping(uint => Game) public games;
 
-    /// @notice Stores the next game Id, is incremented(in createGame function) everytime a game is created
+    /// @notice Stores the next game Id, is incremented(in createGame function) every time a game is created
     uint public nextGameId = 0;
 
     /// @notice Stores the rollover amount in case there is a draw
@@ -198,6 +198,46 @@ contract RockPaperScissors {
         }
     }
 
-    // Add payout function
+    /// @notice Payout function initiates a payout once both players have revealed
+    /// @param _gameId is the index of the game within the games mapping
+    function payout(uint _gameId) public payable isPlayer(_gameId, msg.sender) {
+        require(
+            (games[_gameId].host.move != Move.notRevealed &&
+                games[_gameId].guest.move != Move.notRevealed),
+            "Both players must reveal their moves before a payout can be initiated"
+        );
+        if (
+            games[_gameId].host.playerStatus == PlayerStatus.STATUS_TIE &&
+            games[_gameId].guest.playerStatus == PlayerStatus.STATUS_TIE
+        ) {
+            games[_gameId].host.addr.transfer((games[_gameId].potAmount) / 4);
+            games[_gameId].guest.addr.transfer((games[_gameId].potAmount) / 4);
+            rolloverPot = rolloverPot + ((games[_gameId].potAmount) / 2);
+        } else if (
+            games[_gameId].host.playerStatus == PlayerStatus.STATUS_WIN
+        ) {
+            games[_gameId].host.addr.transfer(
+                games[_gameId].potAmount + rolloverPot
+            );
+            rolloverPot = 0;
+        } else if (
+            games[_gameId].guest.playerStatus == PlayerStatus.STATUS_WIN
+        ) {
+            games[_gameId].guest.addr.transfer(
+                games[_gameId].potAmount + rolloverPot
+            );
+            rolloverPot = 0;
+        } else {
+            games[_gameId].host.addr.transfer(
+                games[_gameId].host.playerBetAmount
+            );
+            games[_gameId].guest.addr.transfer(
+                games[_gameId].guest.playerBetAmount
+            );
+        }
+
+        games[_gameId].gameStatus = GameStatus.STATUS_COMPLETE;
+    }
+
     // Add request refund function
 }

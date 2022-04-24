@@ -13,8 +13,8 @@ Write a new Ethereum smart contract with the following requirements:
       be decided by the contract deployer);
 - [x] It should be impossible for the second player to figure out what the
       first player’s move was before both moves are committed;
-- [ ] When a game is finished, the winner gets to take the full pot;
-- [ ] In the event of a draw, each player can recover only 50% of their
+- [x] When a game is finished, the winner gets to take the full pot;
+- [x] In the event of a draw, each player can recover only 50% of their
       locked amount. The other 50% are to be distributed to the next game
       that finishes;
 - [ ] The repo should include some unit tests to simulate and test the main
