@@ -7,7 +7,7 @@ Write a new Ethereum smart contract with the following requirements:
 - [x] Each game should be identifiable by a unique ID;
 - [x] Once two players commit their move to the same game ID, the game
       is now resolved, and no further moves can be played;
-- [ ] Each game, once started, needs both moves to be played within 48h.
+- [x] Each game, once started, needs both moves to be played within 48h.
       If that doesn’t happen, the first player can get a full refund;
 - [x] To play, both users have to commit a predetermined amount of ETH (to
       be decided by the contract deployer);

@@ -45,6 +45,7 @@ contract RockPaperScissors {
         Player guest;
         uint256 potAmount;
         GameStatus gameStatus;
+        uint createdAt;
     }
 
     /// @notice Stores instances of a Game struct in a mapping, can be accessed using games[gameId]
@@ -106,10 +107,11 @@ contract RockPaperScissors {
                 playerStatus: PlayerStatus.STATUS_PENDING
             }),
             potAmount: msg.value,
+            createdAt: block.timestamp,
             gameStatus: GameStatus.STATUS_NOT_STARTED
         });
         gameId = nextGameId;
-        nextGameId = nextGameId + 1;
+        nextGameId += 1;
     }
 
     /// @notice This function allows a user to join a game
@@ -119,7 +121,7 @@ contract RockPaperScissors {
         require(
             games[_gameId].gameStatus == GameStatus.STATUS_NOT_STARTED &&
                 msg.value == entryFee,
-            "Please check game id and ensure you have sent the exact entry fee"
+            "Please check the game id is valid and ensure you have sent the exact entry fee"
         );
         games[_gameId].guest = Player({
             addr: payable(msg.sender),
@@ -137,7 +139,18 @@ contract RockPaperScissors {
     modifier isPlayer(uint _gameId, address sender) {
         require(
             sender == games[_gameId].host.addr ||
-                sender == games[_gameId].guest.addr
+                sender == games[_gameId].guest.addr,
+            "Only a game player can call this function"
+        );
+        _;
+    }
+
+    /// @notice Ensures that the caller is the host of the game
+    /// @param _gameId is the index of the game within the games mapping
+    modifier isHost(uint _gameId, address sender) {
+        require(
+            sender == games[_gameId].host.addr,
+            "Only the Game host can call this function"
         );
         _;
     }
@@ -198,7 +211,7 @@ contract RockPaperScissors {
         }
     }
 
-    /// @notice Payout function initiates a payout once both players have revealed
+    /// @notice Payout function initiates a payout once both players have revealed their moves
     /// @param _gameId is the index of the game within the games mapping
     function payout(uint _gameId) public payable isPlayer(_gameId, msg.sender) {
         require(
@@ -239,5 +252,23 @@ contract RockPaperScissors {
         games[_gameId].gameStatus = GameStatus.STATUS_COMPLETE;
     }
 
-    // Add request refund function
+    function requestRefund(uint _gameId)
+        public
+        payable
+        isHost(_gameId, msg.sender)
+    {
+        require(
+            block.timestamp >= (games[_gameId].createdAt + 360),
+            "You must wait at least 6 minutes before requesting a refund!"
+        );
+        require(
+            games[_gameId].gameStatus == GameStatus.STATUS_IN_PROGRESS,
+            "Game is not in progress!"
+        );
+        require(
+            games[_gameId].guest.playerStatus != PlayerStatus.STATUS_WIN,
+            "You cannot request a refund because the guest won!"
+        );
+        games[_gameId].host.addr.transfer(games[_gameId].host.playerBetAmount);
+    }
 }
