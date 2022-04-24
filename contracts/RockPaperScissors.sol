@@ -48,10 +48,10 @@ contract RockPaperScissors {
     }
 
     /// @notice Stores instances on a Game struct in a mapping, can be accessed using games[gameId]
-    mapping(uint256 => Game) public games;
+    mapping(uint => Game) public games;
 
     /// @notice Stores the next game Id, is incremented(in createGame function) everytime a game is created
-    uint256 nextGameId = 0;
+    uint nextGameId = 0;
 
     /// @notice Stores the rollover amount in case there is a draw
     uint256 public rolloverPot = 0;
@@ -76,6 +76,36 @@ contract RockPaperScissors {
         returns (bytes32)
     {
         return keccak256(abi.encodePacked(_move, _salt));
+    }
+
+    /// @notice This function allows a user to create a game, they must provide a salted hash of their move (from getSaltedHash) and add the entry fee
+    /// @dev We temporarily assign the player guest struct fields addr and _hashedMove with the same values as the respective player host struct fields
+    function createGame(bytes32 _hashedMove)
+        public
+        payable
+        returns (uint gameId)
+    {
+        require(msg.value == entryFee, "Please provide the exact entry fee");
+        games[nextGameId] = Game({
+            host: Player({
+                addr: payable(msg.sender),
+                playerBetAmount: msg.value,
+                hashedMove: _hashedMove,
+                move: Move.notRevealed,
+                playerStatus: PlayerStatus.STATUS_PENDING
+            }),
+            guest: Player({
+                addr: payable(msg.sender),
+                playerBetAmount: 0,
+                hashedMove: _hashedMove,
+                move: Move.notRevealed,
+                playerStatus: PlayerStatus.STATUS_PENDING
+            }),
+            potAmount: msg.value,
+            gameStatus: GameStatus.STATUS_NOT_STARTED
+        });
+        gameId = nextGameId;
+        nextGameId = nextGameId + 1;
     }
 
     // Events
