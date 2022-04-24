@@ -11,7 +11,6 @@ contract RockPaperScissors {
         entryFee = _entryFee;
     }
 
-    // Data Types
     enum Move {
         rock,
         paper,
@@ -29,6 +28,7 @@ contract RockPaperScissors {
     struct Player {
         address payable addr;
         uint256 playerBetAmount;
+        bytes32 hashedMove;
         Move move;
         PlayerStatus playerStatus;
     }
@@ -50,10 +50,33 @@ contract RockPaperScissors {
     /// @notice Stores instances on a Game struct in a mapping, can be accessed using games[gameId]
     mapping(uint256 => Game) public games;
 
-    /// @notice Stores the next game Id, is incremented everytime a game is created
+    /// @notice Stores the next game Id, is incremented(in createGame function) everytime a game is created
     uint256 nextGameId = 0;
 
+    /// @notice Stores the rollover amount in case there is a draw
+    uint256 public rolloverPot = 0;
+
     // Functions: createGame, joinGame, revealMoves, compareMoves, payout, requestRefund
+
+    /// @notice Check if move is valid
+    modifier isValidMove(Move _move) {
+        require(
+            (_move == Move.rock) ||
+                (_move == Move.paper) ||
+                (_move == Move.scissors)
+        );
+        _;
+    }
+
+    /// @notice This function is used to created a salted hash of the move in order to preserve privacy of a players move
+    function getSaltedHash(Move _move, string memory _salt)
+        public
+        pure
+        isValidMove(_move)
+        returns (bytes32)
+    {
+        return keccak256(abi.encodePacked(_move, _salt));
+    }
 
     // Events
 
