@@ -27,12 +27,10 @@ This challenge required a commit/reveal strategy to ensure that players could no
 3. Guest joins the game by providing a game ID, a salted hash of their move and paying the entry fee.
 4. Host reveals move
 5. Player reveals move
-6. Payout function sends pot amount to the winner
+6. Payout function can be called by any player, it sends pot amount to the winner
 7. In case of a draw, on 50 % of the entry fee is returned to each player, the remainder is sent to a rollover pot for the next winning game.
-8. If 48 hours have elapsed between the game creation and both players have not revealed, the host can request a refund.
+8. If 48 hours have elapsed between the game creation and both players have not revealed, the host can request a refund using requestRefund() function
 
 # To run tests:
 
 npx hardhat test
-
-# Setup instructions:
