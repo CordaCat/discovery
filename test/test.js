@@ -20,22 +20,20 @@ beforeEach(async () => {
   potAmount = await game[2];
   host = await game[0];
   guest = await game[2];
+  next_game_Id = await contract.nextGameId();
+  startTime = await game[4];
 });
 
 describe("Create a game", function () {
   it("Should increment nextGameId by one", async function () {
-    // Contract is created already in beforeEach above
-    next_game_Id = await contract.nextGameId();
     expect(next_game_Id).to.equal(1);
   });
 
   it("Should increase the pot amount by the entry fee amount", async function () {
-    const pot = await game[2];
-    expect(pot).to.equal(1000);
+    expect(potAmount).to.equal(1000);
   });
 
   it("Should set a start time", async function () {
-    const startTime = await game[4];
     expect(startTime).to.not.equal(0);
   });
 });

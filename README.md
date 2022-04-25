@@ -31,6 +31,14 @@ This challenge required a commit/reveal strategy to ensure that players could no
 7. In case of a draw, on 50 % of the entry fee is returned to each player, the remainder is sent to a rollover pot for the next winning game.
 8. If 48 hours have elapsed between the game creation and both players have not revealed, the host can request a refund using requestRefund() function
 
+# To run locally
+
+1. Start a local node using
+   `npx hardhat node`
+
+2. Open a new terminal and deploy the smart contract in the localhost network using
+   `npx hardhat run --network localhost scripts/deploy.js`
+
 # To run tests:
 
-npx hardhat test
+`npx hardhat test`
