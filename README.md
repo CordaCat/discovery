@@ -34,7 +34,7 @@ This challenge required a commit/reveal strategy to ensure that players could no
 Attack Vectors:
 There are a few scenarios that should be explored.
 
-1. Guest reveals, but the host does not. In this scenario the host could potentiolly lock up the guest's entry fee indefinitely. The refund function can only be called by the host (as per the requirements). The fix would be to allow the guest to call the refund function if the host does not reveal after 48 hrs.
+1. Guest reveals, but the host does not. In this scenario the host could potentially lock up the guest's entry fee indefinitely. The refund function can only be called by the host (as per the requirements). The fix would be to allow the guest to call the refund function if the host does not reveal after 48 hrs.
 2. In a draw scenario 50% of the pot will go to the rollover pot. It is possible for two colluding parties to time their game so that it finishes directly after a draw. This would be trivial to perform and could also be performed by a single attacker.
 
 # To run locally

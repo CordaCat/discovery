@@ -87,18 +87,34 @@ describe("Reveal a move", function () {
     expect(player_move).lessThanOrEqual(2);
   });
 });
-// describe("Initaite Payout to winner", function () {
-//   it("Increase winners balance by pot amount", async function () {
-//     // Guest joins game
-//     await contract
-//       .connect(alice)
-//       .joinGame(
-//         0,
-//         "0xc5df0b6cfb09a97697e51c816ef269f0eb180ebf4183ab2688ea7c5a9a2f9ea8",
-//         { value: 1000 }
-//       );
-//     await contract.revealMove(0, 0, "pass");
-//     let player_move = game[0][3];
-//     console.log("player move:", player_move);
-//     console.log("game:", game);
-//   });
+
+describe("Should Payout winner with pot amount", function () {
+  beforeEach(async () => {
+    // We join the existing game (game[0]) with Alice's account
+    await contract
+      .connect(alice)
+      .joinGame(
+        0,
+        "0xc5df0b6cfb09a97697e51c816ef269f0eb180ebf4183ab2688ea7c5a9a2f9ea8",
+        { value: 1000 }
+      );
+  });
+  it("Should reveal the host's move", async function () {
+    await contract.revealMove(0, 0, "pass");
+    let game = await contract.games([0]);
+    console.log[("Game:  ", game)];
+    let player_move = game[0][3];
+    expect(player_move).lessThanOrEqual(2);
+  });
+
+  it("Should reveal the guest's move", async function () {
+    await contract.revealMove(0, 0, "pass");
+    let game = await contract.games([0]);
+    console.log[("Game:  ", game)];
+    let player_move = game[0][3];
+    expect(player_move).lessThanOrEqual(2);
+  });
+});
+
+// Draw
+// Refund
