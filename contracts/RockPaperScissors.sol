@@ -262,7 +262,8 @@ contract RockPaperScissors {
             "You must wait at least 48 hours before requesting a refund!"
         );
         require(
-            games[_gameId].gameStatus == GameStatus.STATUS_IN_PROGRESS,
+            games[_gameId].gameStatus == GameStatus.STATUS_IN_PROGRESS ||
+                games[_gameId].gameStatus == GameStatus.STATUS_NOT_STARTED,
             "Game is not in progress!"
         );
         require(
