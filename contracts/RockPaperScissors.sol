@@ -84,7 +84,7 @@ contract RockPaperScissors {
     /// @notice This function allows a user to create a game, they must provide a salted hash of their move (from getSaltedHash) and add the entry fee
     /// @param _hashedMove is the salted hash of the players move
     /// @dev We temporarily assign the player guest struct fields addr and _hashedMove with the same values as their respective player host struct fields
-    /// @return gameId is the index of the game within the games mapping
+    /// @return gameId is the index of the newly created game within the games mapping
     function createGame(bytes32 _hashedMove)
         public
         payable
@@ -121,7 +121,7 @@ contract RockPaperScissors {
         require(
             games[_gameId].gameStatus == GameStatus.STATUS_NOT_STARTED &&
                 msg.value == entryFee,
-            "Please check the game id is valid and ensure you have sent the exact entry fee"
+            "Please check the gameId is valid and ensure you have sent the exact entry fee"
         );
         games[_gameId].guest = Player({
             addr: payable(msg.sender),
@@ -258,8 +258,8 @@ contract RockPaperScissors {
         isHost(_gameId, msg.sender)
     {
         require(
-            block.timestamp >= (games[_gameId].createdAt + 360),
-            "You must wait at least 6 minutes before requesting a refund!"
+            block.timestamp >= (games[_gameId].createdAt + 172800),
+            "You must wait at least 48 hours before requesting a refund!"
         );
         require(
             games[_gameId].gameStatus == GameStatus.STATUS_IN_PROGRESS,

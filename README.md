@@ -19,3 +19,20 @@ Write a new Ethereum smart contract with the following requirements:
      that finishes;
 - [ ] 9. The repo should include some unit tests to simulate and test the main
      behaviors of the game.
+
+This challenge required a commit/reveal strategy to ensure that players could not see each others moves before the reveal stage. The flow of the game is as follows:
+
+1. Host creates a hashed salt of their move by calling getSaltedHash() and providing a move and a password.
+2. Host creates a game by calling createGame() and providing the salted hash from above and paying the entry fee.
+3. Guest joins the game by providing a game ID, a salted hash of their move and paying the entry fee.
+4. Host reveals move
+5. Player reveals move
+6. Payout function sends pot amount to the winner
+7. In case of a draw, on 50 % of the entry fee is returned to each player, the remainder is sent to a rollover pot for the next winning game.
+8. If 48 hours have elapsed between the game creation and both players have not revealed, the host can request a refund.
+
+# To run tests:
+
+npx hardhat test
+
+# Setup instructions:
