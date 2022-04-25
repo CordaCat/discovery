@@ -52,10 +52,10 @@ contract RockPaperScissors {
     mapping(uint => Game) public games;
 
     /// @notice Stores the next game Id, is incremented(in createGame function) every time a game is created
-    uint public nextGameId = 0;
+    uint public nextGameId;
 
     /// @notice Stores the rollover amount in case there is a draw
-    uint256 public rolloverPot = 0;
+    uint256 rolloverPot;
 
     /// @notice Check if move is valid, we restrict the move to rock, paper or scissors
     /// @param _move is the player move
