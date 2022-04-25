@@ -40,6 +40,7 @@ describe("Create a game", function () {
 
 describe("Join a game", function () {
   beforeEach(async () => {
+    // We join the existing game (game[0]) with Alice's account
     await contract
       .connect(alice)
       .joinGame(
@@ -61,6 +62,7 @@ describe("Join a game", function () {
 
 describe("Reveal a move", function () {
   beforeEach(async () => {
+    // We join the existing game (game[0]) with Alice's account
     await contract
       .connect(alice)
       .joinGame(
@@ -72,6 +74,7 @@ describe("Reveal a move", function () {
   it("Should reveal the host's move", async function () {
     await contract.revealMove(0, 0, "pass");
     let game = await contract.games([0]);
+    console.log[("Game:  ", game)];
     let player_move = game[0][3];
     expect(player_move).lessThanOrEqual(2);
   });
@@ -79,6 +82,7 @@ describe("Reveal a move", function () {
   it("Should reveal the guest's move", async function () {
     await contract.revealMove(0, 0, "pass");
     let game = await contract.games([0]);
+    console.log[("Game:  ", game)];
     let player_move = game[0][3];
     expect(player_move).lessThanOrEqual(2);
   });
