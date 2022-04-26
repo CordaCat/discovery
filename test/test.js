@@ -88,6 +88,7 @@ describe("Reveal a move", function () {
 
 describe("Should Payout winner with pot amount", function () {
   beforeEach(async () => {
+    // [owner, alice, bob] = await ethers.getSigners();
     // We join the existing game (game[0]) with Alice's account
     await contract
       .connect(alice)
