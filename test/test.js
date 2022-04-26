@@ -84,7 +84,6 @@ describe("Reveal a move", function () {
   it("Should reveal the guest's move", async function () {
     await contract.connect(alice).revealMove(0, 1, "pass");
     const game = await contract.games([0]);
-    // console.log("GAME:", game);
     const guest_move = game[1][3];
     expect(guest_move).lessThanOrEqual(2);
   });
@@ -105,7 +104,6 @@ describe("Should Payout winner with pot amount", function () {
     await contract.revealMove(0, 0, "pass");
     const game = await contract.games([0]);
     const host_move = game[0][3];
-    console.log("HOST MOVE:", host_move);
     expect(host_move).to.equal(0);
   });
 
@@ -114,16 +112,24 @@ describe("Should Payout winner with pot amount", function () {
     await contract.connect(alice).revealMove(0, 1, "pass");
     const game = await contract.games([0]);
     const guest_move = game[1][3];
-    console.log("GUEST MOVE:", guest_move);
     expect(guest_move).to.equal(1);
   });
 
-  it("Should update player status of winner", async function () {
+  it("Should update player status of the winner", async function () {
     await contract.revealMove(0, 0, "pass");
     await contract.connect(alice).revealMove(0, 1, "pass");
     const game = await contract.games([0]);
-    const player_status = game[1][4];
-    console.log("PLAYER STATUS:", player_status);
+
+    const host_player_status = game[0][4];
+    const guest_player_status = game[1][4];
+    expect(guest_player_status).to.equal(0);
+  });
+  it("Should update player status of the loser", async function () {
+    await contract.revealMove(0, 0, "pass");
+    await contract.connect(alice).revealMove(0, 1, "pass");
+    const game = await contract.games([0]);
+    const host_player_status = game[0][4];
+    expect(host_player_status).to.equal(1);
   });
   // it("Should update player status of loser", async function () {});
 
