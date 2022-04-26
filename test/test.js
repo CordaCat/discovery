@@ -70,7 +70,7 @@ describe("Reveal a move", function () {
       .connect(alice)
       .joinGame(
         0,
-        "0xc5df0b6cfb09a97697e51c816ef269f0eb180ebf4183ab2688ea7c5a9a2f9ea8",
+        "0x981eba72fe369eaf5013fbafc2cec2f5dfa27ed62ccb51aaa0f9d487fb46a41b",
         { value: 1000 }
       );
   });
@@ -82,7 +82,7 @@ describe("Reveal a move", function () {
   });
 
   it("Should reveal the guest's move", async function () {
-    await contract.connect(alice).revealMove(0, 0, "pass");
+    await contract.connect(alice).revealMove(0, 1, "pass");
     const game = await contract.games([0]);
     const guest_move = game[1][3];
     expect(guest_move).lessThanOrEqual(2);
@@ -92,13 +92,12 @@ describe("Reveal a move", function () {
 describe("Should Payout winner with pot amount", function () {
   beforeEach(async () => {
     // We join the existing game (game[0]) with Alice's account
-    await contract
-      .connect(alice)
-      .joinGame(
-        0,
-        "0xc5df0b6cfb09a97697e51c816ef269f0eb180ebf4183ab2688ea7c5a9a2f9ea8",
-        { value: 1000 }
-      );
+    await contract.connect(alice).joinGame(
+      0,
+      // Salted Hash of move, in this case Alice's move is Paper and her password is "pass"
+      "0x981eba72fe369eaf5013fbafc2cec2f5dfa27ed62ccb51aaa0f9d487fb46a41b",
+      { value: 1000 }
+    );
   });
   it("Should reveal the host's move", async function () {
     await contract.revealMove(0, 0, "pass");
@@ -108,16 +107,13 @@ describe("Should Payout winner with pot amount", function () {
   });
 
   it("Should reveal the guest's move", async function () {
-    await contract.connect(alice).revealMove(0, 0, "pass");
+    await contract.connect(alice).revealMove(0, 1, "pass");
     const game = await contract.games([0]);
     const guest_move = game[1][3];
     expect(guest_move).lessThanOrEqual(2);
   });
   // it("Should update player status of winner", async function () {});
-
-  // it("Should increase the winners balance by pot amount", async function () {
-  //   assert.fail;
-  // });
+  // it("Should increase the winners balance by pot amount", async function () {});
   // it("Should decrease the losers balance by entry fee amount", async function () {});
 });
 
