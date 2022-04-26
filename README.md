@@ -20,6 +20,8 @@ Write a new Ethereum smart contract with the following requirements:
 - [ ] 9. The repo should include some unit tests to simulate and test the main
      behaviors of the game.
 
+# Process Flow
+
 This challenge required a commit/reveal strategy to ensure that players could not see each others moves before the reveal stage. The flow of the game is as follows:
 
 1. Host creates a hashed salt of their move by calling getSaltedHash() and providing a move and a password.
@@ -31,7 +33,8 @@ This challenge required a commit/reveal strategy to ensure that players could no
 7. In case of a draw, on 50 % of the entry fee is returned to each player, the remainder is sent to a rollover pot for the next winning game.
 8. If 48 hours have elapsed between the game creation and both players have not revealed, the host can request a refund using requestRefund() function. Also if the host creates a game and no one joins, this function may be called after 48 hours.
 
-Attack Vectors:
+# Attack Vectors:
+
 There are a few scenarios that should be explored.
 
 1. Guest reveals, but the host does not. In this scenario the host could potentially lock up the guest's entry fee indefinitely. The refund function can only be called by the host (as per the requirements). The fix would be to allow the guest to call the refund function if the host does not reveal after 48 hrs.
