@@ -50,4 +50,8 @@ There are a few scenarios that should be explored.
 
 # To run tests:
 
-`npx hardhat test`
+1. From the root of the project run
+   `yarn install`
+
+2. Then
+   `yarn test`
