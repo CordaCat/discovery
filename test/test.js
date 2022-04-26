@@ -84,6 +84,7 @@ describe("Reveal a move", function () {
   it("Should reveal the guest's move", async function () {
     await contract.connect(alice).revealMove(0, 1, "pass");
     const game = await contract.games([0]);
+    // console.log("GAME:", game);
     const guest_move = game[1][3];
     expect(guest_move).lessThanOrEqual(2);
   });
@@ -100,19 +101,32 @@ describe("Should Payout winner with pot amount", function () {
     );
   });
   it("Should reveal the host's move", async function () {
+    // The host commits their move as part of the createGame() function.  In the case below the host's move is Rock and the password is "pass"
     await contract.revealMove(0, 0, "pass");
     const game = await contract.games([0]);
     const host_move = game[0][3];
-    expect(host_move).lessThanOrEqual(2);
+    console.log("HOST MOVE:", host_move);
+    expect(host_move).to.equal(0);
   });
 
   it("Should reveal the guest's move", async function () {
+    // The guest commits their move as part of the joinGame() function.  In the case below the guest's move is Paper and the password is "pass"
     await contract.connect(alice).revealMove(0, 1, "pass");
     const game = await contract.games([0]);
     const guest_move = game[1][3];
-    expect(guest_move).lessThanOrEqual(2);
+    console.log("GUEST MOVE:", guest_move);
+    expect(guest_move).to.equal(1);
   });
-  // it("Should update player status of winner", async function () {});
+
+  it("Should update player status of winner", async function () {
+    await contract.revealMove(0, 0, "pass");
+    await contract.connect(alice).revealMove(0, 1, "pass");
+    const game = await contract.games([0]);
+    const player_status = game[1][4];
+    console.log("PLAYER STATUS:", player_status);
+  });
+  // it("Should update player status of loser", async function () {});
+
   // it("Should increase the winners balance by pot amount", async function () {});
   // it("Should decrease the losers balance by entry fee amount", async function () {});
 });
